@@ -1,35 +1,32 @@
-/* eslint-disable jsx-quotes, react/prop-types, max-len, no-underscore-dangle */
+/* eslint-disable jsx-quotes, react/prop-types, console-log, max-len, no-underscore-dangle */
 
 import React from 'react';
 
 class HeroSelector extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = { };
   }
 
   render() {
+    let creatureTag = this.props.creatures.map(c => <tr><td><img src={c.image} key={Math.random()} alt='' /><div>{c.name}</div></td></tr>);
+    console.log('this: ', creatureTag);
     return (
       <div>
         <table>
-          <th>
-            <h1>{this.props.name}</h1>
-          </th>
-          <tr>
-            <td>
-              <img src="http://www.fakingnews.firstpost.com/wp-content/uploads/2015/12/kim-jaya.jpg" alt='' />
-              <div>fighter1</div>
-            </td>
-            <td>
-              <img src="http://www.fakingnews.firstpost.com/wp-content/uploads/2015/12/kim-jaya.jpg" alt='' />
-              <div>fighter2</div>
-            </td>
-            <td>
-              <img src="http://www.fakingnews.firstpost.com/wp-content/uploads/2015/12/kim-jaya.jpg" alt='' />
-              <div>fighter3</div>
-            </td>
-          </tr>
+          <thead>
+            <tr>
+              <th>
+                <h1>{this.props.name}</h1>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {creatureTag}
+          </tbody>
         </table>
+        <div>
+        </div>
       </div>
     );
   }
