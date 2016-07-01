@@ -8,14 +8,17 @@ let hero1Object = '';
 let hero2Object = '';
 let weapon1Object = '';
 let weapon2Object = '';
+const maxTimer = 60;
 
 class PreFightApp extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { creatures: [], weapons: [] };
+    this.state = { creatures: [], weapons: [], timer: maxTimer };
     this.refresh = this.refresh.bind(this);
     this.confirm = this.confirm.bind(this);
     this.fight = this.fight.bind(this);
+    this.performRound = this.performRound.bind(this);
+    this.attack = this.attack.bind(this);
   }
   componentDidMount() {
     this.refresh();
@@ -32,7 +35,6 @@ class PreFightApp extends React.Component {
     .then(j => {
       this.setState({ weapons: j.weapons });
     });
-    console.log('refresh has run', this.state.creatures, this.state.weapons);
   }
 
   confirm(event) {
@@ -63,34 +65,48 @@ class PreFightApp extends React.Component {
     // this.setState({ hero1Object, hero2Object, weapon1Object, weapon2Object });
   }
 
+
   fight() {
-    let timer = 60;
-    while (timer > 0 && hero1Object.health >= 0 && hero2Object.health >= 0) {
-      timer -= 1;
+    console.log('~~~~~state~~~~~~~~~~~~~~~~~~~', this.state);
+    console.log('inside the while loop time at start of round is:', this.state.timer);
+    this.inc = setInterval(this.performRound(), 1000);
+    if (this.state.timer <= 0) {
+      clearInterval(this.inc);
+      console.log('time remaining after fight is', this.state.timer);
     }
+  }
+
+  performRound() {
+    this.attack(hero1Object, weapon1Object, hero2Object);
+    this.attack(hero2Object, weapon2Object, hero1Object);
+    const currentTime = this.state.timer - 1;
+    this.setState({ timer: currentTime });
+    console.log('time remaining after current round is', this.state.timer, currentTime);
+    this.fight();
+  }
+
+  attack(attacker, attackerWeapon, defender) {
+    console.log(attacker.name, 'hits', defender.name, 'with', attackerWeapon.name);
   }
 
   render() {
     let hero1 = ''; let hero2 = '';
     let weapon1 = ''; let weapon2 = '';
     let fightbox1 = ''; let fightbox2 = '';
-    let fightButton = '';
+    let fightButton = ''; let timerDisplay = '';
     if (this.state.creatures.length > 0) {
-      console.log('hero wins!');
       hero1 = <HeroSelector ref='Hero1' name='Pick the First Hero' creatures={this.state.creatures} confirm={this.confirm} />;
       hero2 = <HeroSelector ref='Hero2' name='Pick the Second Hero' creatures={this.state.creatures} confirm={this.confirm} />;
     }
     if (this.state.weapons.length > 0) {
-      console.log('Weapons are found!');
       weapon1 = <WeaponSelector ref='Weapon1' name='Pick the First Heroes weapon' weapons={this.state.weapons} confirm={this.confirm} />;
       weapon2 = <WeaponSelector ref='Weapon2' name='Pick the Second Heroes weapon' weapons={this.state.weapons} confirm={this.confirm} />;
     }
-    console.log('~~~~~state~~~~~~~~~~~~~~~~~~~', this.state);
     if (this.state.weapon2Object) {
-      console.log('starting fight');
       fightbox1 = <FightBox ref='fighter1' hero={this.state.hero1Object} weapon={this.state.weapon1Object} />;
       fightbox2 = <FightBox ref='fighter2' hero={this.state.hero2Object} weapon={this.state.weapon2Object} />;
       fightButton = <button onClick={this.fight} name={this.props.name}>Fight!!!!</button>;
+      timerDisplay = <div ref='timer' value={this.state.timer}><h1>{this.state.timer}</h1></div>;
     }
     return (
       <div>
@@ -109,6 +125,7 @@ class PreFightApp extends React.Component {
         <div className='row'>
           <div className='col-xs-3'>
             {fightButton}
+            {timerDisplay}
           </div>
         </div>
       </div>

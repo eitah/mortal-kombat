@@ -8,7 +8,6 @@ class FightBox extends React.Component {
   }
 
   render() {
-    console.log('herobox is redering', this.props);
     return (
       <div>
         <div className='row'>

@@ -11,7 +11,6 @@ class HeroSelector extends React.Component {
 
   select(e) {
     const cls = this.state.cls === 'open' ? 'taken' : 'open';
-    console.log('after select');
 
     const selectedHeroID = e.currentTarget.getAttribute('data-id');
 
@@ -20,7 +19,6 @@ class HeroSelector extends React.Component {
 
   render() {
     let creatureTag = this.props.creatures.map(c => <tr><td><div data-id={c._id} onClick={this.select} className={this.state.selectedHeroID === c._id ? 'taken' : 'open'} ><img src={c.image} key={Math.random()} ref={c._id} height='150px' alt='' /><div>{c.name}</div></div></td></tr>);
-    console.log('this: ', creatureTag);
     return (
       <div>
         <table>
