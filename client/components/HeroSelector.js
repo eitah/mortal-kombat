@@ -6,19 +6,21 @@ class HeroSelector extends React.Component {
   constructor(props) {
     super(props);
     this.state = { cls: 'open' };
-    this.select = this.select.bind(this);
   }
 
-  select(e) {
-    const cls = this.state.cls === 'open' ? 'taken' : 'open';
-
-    const selectedHeroID = e.currentTarget.getAttribute('data-id');
-
-    this.setState({ cls, selectedHeroID });
-  }
+  // select(e) {
+  //   const cls = this.state.cls === 'open' ? 'taken' : 'open';
+  //
+  //   const selectedHeroID = e.currentTarget.getAttribute('data-id');
+  //
+  //   this.setState({ cls, selectedHeroID });
+  //
+  //   // this.props.confirm;
+  // }
 
   render() {
-    let creatureTag = this.props.creatures.map(c => <tr><td><div data-id={c._id} onClick={this.select} className={this.state.selectedHeroID === c._id ? 'taken' : 'open'} ><img src={c.image} key={Math.random()} ref={c._id} height='150px' alt='' /><div>{c.name}</div></div></td></tr>);
+
+    let creatureTag = this.props.creatures.map((c, i) =>{console.log('id', i); return( <tr><td><div key={i} data-name={this.props.name} data-id={c._id} onClick={this.props.confirm} value={this.state.selectedHeroID} className={this.props.selectedCreature === c._id ? 'taken' : 'open'} ><img src={c.image} key={i} ref={c._id} height='150px' alt='' /><div>{c.name}</div></div></td></tr>)});
     return (
       <div>
         <table>
@@ -34,7 +36,6 @@ class HeroSelector extends React.Component {
           </tbody>
         </table>
         <div>
-          <button onClick={this.props.confirm} name={this.props.name} value={this.state.selectedHeroID} ref="btnConfirm" >Confirm</button>
         </div>
       </div>
     );

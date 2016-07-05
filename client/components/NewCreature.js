@@ -1,3 +1,44 @@
+/* eslint-disable no-console, max-len */
 import React from 'react';
 
-export default () => <h1>New Creature</h1>;
+class NewCreature extends React.Component {
+  constructor(props) {
+    super(props);
+    this.getCreature = this.getCreature.bind(this);
+    this.state = { name: '', image: '' };
+  }
+
+
+  getCreature() {
+    this.state.name = this.refs.txtName.value;
+    this.state.image = this.refs.txtImage.value;
+    fetch('/creatures', {
+      method: 'POST',
+      body: JSON.stringify({ name: this.state.name, image: this.state.image }),
+      headers: { 'Content-Type': 'Application/json' },
+      credentials: 'same-origin',
+    }).then((response) => {
+      response.json().then((data) => {
+        console.log('data =', data);
+      });
+    });
+    console.log('method finished');
+  }
+
+  render() {
+    return (
+      <div>
+
+        <h1>New Creature</h1>
+
+        <h3> Creature Name: <input type="text" name="name" ref="txtName" defaultValue="Danerys"></input></h3>
+        <h3> Creature's Image (URL): <input type="text" name="image" ref="txtImage" defaultValue="data:image/jpeg;base64,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"></input></h3>
+
+        <input type="button" onClick={this.getCreature} value="Post your New Creature" />
+      </div>
+    );
+  }
+}
+
+
+export default NewCreature;

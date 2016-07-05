@@ -21,8 +21,8 @@ app.listen(port, () => {
 });
 
 // your routes go here. app.get(*) should be last. it is the 404 page.
-app.use('/creature', require('./controllers/creatureController'));
-app.use('/weapon', require('./controllers/weaponController'));
+app.use('/creatures', require('./controllers/creatureController'));
+app.use('/weapons', require('./controllers/weaponController'));
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../static/index.html'));
 });

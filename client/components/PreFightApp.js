@@ -1,36 +1,38 @@
-/* eslint-disable jsx-quotes, react/prop-types, max-len, no-underscore-dangle, no-unused-vars, no-console */
+/* eslint-disable jsx-quotes, react/prop-types, max-len, no-underscore-dangle, no-unused-vars, no-console, no-param-reassign */
 import React from 'react';
 import HeroSelector from './HeroSelector';
 import WeaponSelector from './WeaponSelector';
 import FightBox from './FightBox';
 import { Link } from 'react-router';
-let hero1Object = '';
-let hero2Object = '';
+let hero1Object = { _id: '' };
+let hero2Object = { _id: '' };
 let weapon1Object = '';
 let weapon2Object = '';
 const maxTimer = 60;
+let currentTime = maxTimer;
+let count = 0;
 
 class PreFightApp extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { creatures: [], weapons: [], timer: maxTimer };
+    this.state = { creatures: [], weapons: [], timer: maxTimer, hero1Object, hero2Object };
     this.refresh = this.refresh.bind(this);
     this.confirm = this.confirm.bind(this);
     this.fight = this.fight.bind(this);
-    this.performRound = this.performRound.bind(this);
     this.attack = this.attack.bind(this);
   }
+
   componentDidMount() {
     this.refresh();
   }
 
   refresh() {
-    fetch('/creature')
+    fetch('/creatures')
     .then(r => r.json())
     .then(j => {
       this.setState({ creatures: j.creatures });
     });
-    fetch('/weapon')
+    fetch('/weapons')
     .then(r => r.json())
     .then(j => {
       this.setState({ weapons: j.weapons });
@@ -38,14 +40,13 @@ class PreFightApp extends React.Component {
   }
 
   confirm(event) {
-    console.log('event current target :', event.currentTarget.name);
-    if (event.currentTarget.name === 'Pick the First Hero') {
-      const hero1Id = this.refs.Hero1.refs.btnConfirm.value;
+    if (event.currentTarget.getAttribute('data-name') === 'Pick the First Hero') {
+      const hero1Id = event.currentTarget.getAttribute('data-id');
       hero1Object = this.state.creatures.find(c => c._id === hero1Id);
       this.setState({ hero1Object });
     }
-    if (event.currentTarget.name === 'Pick the Second Hero') {
-      const hero2Id = this.refs.Hero2.refs.btnConfirm.value;
+    if (event.currentTarget.getAttribute('data-name') === 'Pick the Second Hero') {
+      const hero2Id = event.currentTarget.getAttribute('data-id');
       hero2Object = this.state.creatures.find(c => c._id === hero2Id);
       this.setState({ hero2Object });
     }
@@ -69,24 +70,54 @@ class PreFightApp extends React.Component {
   fight() {
     console.log('~~~~~state~~~~~~~~~~~~~~~~~~~', this.state);
     console.log('inside the while loop time at start of round is:', this.state.timer);
-    this.inc = setInterval(this.performRound(), 1000);
-    if (this.state.timer <= 0) {
-      clearInterval(this.inc);
-      console.log('time remaining after fight is', this.state.timer);
-    }
+    count = 0;
+    this.inc = setInterval(() => {
+      if ((this.state.timer > 0) && (hero1Object.health > 0 && hero2Object.health > 0)) {
+        this.attack(hero1Object, weapon1Object, hero2Object);
+        this.attack(hero2Object, weapon2Object, hero1Object);
+        this.setState({ hero1Object, hero2Object });
+
+        console.log('promise time is ', this.state.timer);
+        currentTime = this.state.timer - 1;
+        this.setState({ timer: currentTime });
+      } else {
+        clearInterval(this.inc);
+      }
+
+
+      // const promiseDamage = new Promise(() => {
+      //  });
+      // promiseDamage.then(() => this.setState({ hero1Object, hero2Object }));
+
+      // const promiseTime = new Promise(
+      //   (resolve, reject) => {
+      //     console.log('promise time is ', this.state.timer);
+      //     currentTime = this.state.timer - 1;
+      //     resolve();
+      //   });
+      // promiseTime.then(
+      //   () => {
+      //     this.setState({ timer: currentTime });
+      //     console.log('after promise time is ', this.state.timer);
+      //   });
+      // promiseTime.then(
+      //   () => {
+      //     if (this.state.timer <= 0) {
+      //       clearInterval(this.inc);
+      //       console.log('trying to start new round', this.inc);
+      //     }
+      //   });
+      //
+    }, 300);
+    console.log('time remaining after fight is', this.state.timer);
   }
 
-  performRound() {
-    this.attack(hero1Object, weapon1Object, hero2Object);
-    this.attack(hero2Object, weapon2Object, hero1Object);
-    const currentTime = this.state.timer - 1;
-    this.setState({ timer: currentTime });
-    console.log('time remaining after current round is', this.state.timer, currentTime);
-    this.fight();
-  }
 
   attack(attacker, attackerWeapon, defender) {
-    console.log(attacker.name, 'hits', defender.name, 'with', attackerWeapon.name);
+    const resultAttack = Math.floor(Math.random() * attackerWeapon.attack);
+    console.log(attacker.name, 'hits', defender.name, 'with', attackerWeapon.name, 'of max strength', attackerWeapon.attack, 'result is', resultAttack);
+    const currentHealth = defender.health - resultAttack;
+    defender.health = currentHealth;
   }
 
   render() {
@@ -95,8 +126,8 @@ class PreFightApp extends React.Component {
     let fightbox1 = ''; let fightbox2 = '';
     let fightButton = ''; let timerDisplay = '';
     if (this.state.creatures.length > 0) {
-      hero1 = <HeroSelector ref='Hero1' name='Pick the First Hero' creatures={this.state.creatures} confirm={this.confirm} />;
-      hero2 = <HeroSelector ref='Hero2' name='Pick the Second Hero' creatures={this.state.creatures} confirm={this.confirm} />;
+      hero1 = <HeroSelector ref='Hero1' name='Pick the First Hero' creatures={this.state.creatures} selectedCreature={this.state.hero1Object._id} confirm={this.confirm} />;
+      hero2 = <HeroSelector ref='Hero2' name='Pick the Second Hero' creatures={this.state.creatures} selectedCreature={this.state.hero2Object._id} confirm={this.confirm} />;
     }
     if (this.state.weapons.length > 0) {
       weapon1 = <WeaponSelector ref='Weapon1' name='Pick the First Heroes weapon' weapons={this.state.weapons} confirm={this.confirm} />;
