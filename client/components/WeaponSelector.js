@@ -6,20 +6,34 @@ class WeaponSelector extends React.Component {
   constructor(props) {
     super(props);
     this.state = { cls: 'open' };
-    this.select = this.select.bind(this);
+    // this.select = this.select.bind(this);
   }
 
-  select(e) {
-    const cls = this.state.cls === 'open' ? 'taken' : 'open';
-    console.log('after select');
-
-    const selectedWeaponID = e.currentTarget.getAttribute('data-id');
-
-    this.setState({ cls, selectedWeaponID });
-  }
+  // select(e) {
+  //   const cls = this.state.cls === 'open' ? 'taken' : 'open';
+  //   console.log('after select');
+  //
+  //   const selectedWeaponID = e.currentTarget.getAttribute('data-id');
+  //
+  //   this.setState({ cls, selectedWeaponID });
+  // }
 
   render() {
-    let weaponTag = this.props.weapons.map(w => <tr><td><div data-id={w._id} onClick={this.select} className={this.state.selectedWeaponID === w._id ? 'taken' : 'open'} ><img src={w.image} key={Math.random()} ref={w._id} height='150px' alt='' /><div>{w.name}</div></div></td></tr>);
+    let weaponTag = this.props.weapons.map((w, i) =>
+      <tr>
+        <td>
+          <div
+            data-name={this.props.name}
+            key={i}
+            data-id={w._id}
+            onClick={this.props.confirm}
+            className={this.props.selectedWeapon === w._id ? 'taken' : 'open'}
+          >
+            <img src={w.image} key={Math.random()} ref={w._id} height='150px' alt='' />
+            <div>{w.name}</div>
+          </div>
+        </td>
+      </tr>);
     return (
       <div>
         <table>
@@ -35,7 +49,6 @@ class WeaponSelector extends React.Component {
           </tbody>
         </table>
         <div>
-          <button onClick={this.props.confirm} name={this.props.name} value={this.state.selectedWeaponID} ref="btnConfirm" >Confirm</button>
         </div>
       </div>
     );

@@ -19,8 +19,20 @@ class HeroSelector extends React.Component {
   // }
 
   render() {
-
-    let creatureTag = this.props.creatures.map((c, i) =>{console.log('id', i); return( <tr><td><div key={i} data-name={this.props.name} data-id={c._id} onClick={this.props.confirm} value={this.state.selectedHeroID} className={this.props.selectedCreature === c._id ? 'taken' : 'open'} ><img src={c.image} key={i} ref={c._id} height='150px' alt='' /><div>{c.name}</div></div></td></tr>)});
+    let creatureTag = this.props.creatures.map((c, i) => {
+      console.log('id', i);
+      return (
+        <tr>
+          <td>
+            <div key={i} data-name={this.props.name} data-id={c._id} onClick={this.props.confirm} value={this.state.selectedHeroID} className={this.props.selectedCreature === c._id ? 'taken' : 'open'} >
+              <img src={c.image} key={i} ref={c._id} height='150px' alt='' />
+              <div> Fighter: {c.name}</div>
+              <div> Wins: {c.wins}</div>
+              <div> Losses: {c.losses}</div>
+            </div>
+          </td>
+        </tr>);
+    });
     return (
       <div>
         <table>

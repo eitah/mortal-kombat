@@ -6,8 +6,8 @@ import FightBox from './FightBox';
 import { Link } from 'react-router';
 let hero1Object = { _id: '' };
 let hero2Object = { _id: '' };
-let weapon1Object = '';
-let weapon2Object = '';
+let weapon1Object = { _id: '' };
+let weapon2Object = { _id: '' };
 const maxTimer = 60;
 let currentTime = maxTimer;
 let count = 0;
@@ -15,7 +15,7 @@ let count = 0;
 class PreFightApp extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { creatures: [], weapons: [], timer: maxTimer, hero1Object, hero2Object };
+    this.state = { creatures: [], weapons: [], timer: maxTimer, hero1Object, hero2Object, weapon1Object, weapon2Object };
     this.refresh = this.refresh.bind(this);
     this.confirm = this.confirm.bind(this);
     this.fight = this.fight.bind(this);
@@ -50,14 +50,13 @@ class PreFightApp extends React.Component {
       hero2Object = this.state.creatures.find(c => c._id === hero2Id);
       this.setState({ hero2Object });
     }
-    if (event.currentTarget.name === 'Pick the First Heroes weapon') {
-      const weapon1Id = this.refs.Weapon1.refs.btnConfirm.value;
-      console.log('weapon 1 entered', this.refs.Weapon1.refs.btnConfirm.value);
+    if (event.currentTarget.getAttribute('data-name') === 'Pick the First Heroes weapon') {
+      const weapon1Id = event.currentTarget.getAttribute('data-id');
       weapon1Object = this.state.weapons.find(w => w._id === weapon1Id);
       this.setState({ weapon1Object });
     }
-    if (event.currentTarget.name === 'Pick the Second Heroes weapon') {
-      const weapon2Id = this.refs.Weapon2.refs.btnConfirm.value;
+    if (event.currentTarget.getAttribute('data-name') === 'Pick the Second Heroes weapon') {
+      const weapon2Id = event.currentTarget.getAttribute('data-id');
       weapon2Object = this.state.weapons.find(w => w._id === weapon2Id);
       this.setState({ weapon2Object });
       console.log('weapon 2 state is', this.state.weapon2Object);
@@ -80,38 +79,17 @@ class PreFightApp extends React.Component {
         console.log('promise time is ', this.state.timer);
         currentTime = this.state.timer - 1;
         this.setState({ timer: currentTime });
-      } else {
+      } else { 
         clearInterval(this.inc);
+        updateFighter(hero1Object, hero2Object);
       }
-
-
-      // const promiseDamage = new Promise(() => {
-      //  });
-      // promiseDamage.then(() => this.setState({ hero1Object, hero2Object }));
-
-      // const promiseTime = new Promise(
-      //   (resolve, reject) => {
-      //     console.log('promise time is ', this.state.timer);
-      //     currentTime = this.state.timer - 1;
-      //     resolve();
-      //   });
-      // promiseTime.then(
-      //   () => {
-      //     this.setState({ timer: currentTime });
-      //     console.log('after promise time is ', this.state.timer);
-      //   });
-      // promiseTime.then(
-      //   () => {
-      //     if (this.state.timer <= 0) {
-      //       clearInterval(this.inc);
-      //       console.log('trying to start new round', this.inc);
-      //     }
-      //   });
-      //
     }, 300);
     console.log('time remaining after fight is', this.state.timer);
   }
 
+  updateFighter() {
+
+  }
 
   attack(attacker, attackerWeapon, defender) {
     const resultAttack = Math.floor(Math.random() * attackerWeapon.attack);
@@ -130,8 +108,8 @@ class PreFightApp extends React.Component {
       hero2 = <HeroSelector ref='Hero2' name='Pick the Second Hero' creatures={this.state.creatures} selectedCreature={this.state.hero2Object._id} confirm={this.confirm} />;
     }
     if (this.state.weapons.length > 0) {
-      weapon1 = <WeaponSelector ref='Weapon1' name='Pick the First Heroes weapon' weapons={this.state.weapons} confirm={this.confirm} />;
-      weapon2 = <WeaponSelector ref='Weapon2' name='Pick the Second Heroes weapon' weapons={this.state.weapons} confirm={this.confirm} />;
+      weapon1 = <WeaponSelector ref='Weapon1' name='Pick the First Heroes weapon' weapons={this.state.weapons} selectedWeapon={this.state.weapon1Object._id} confirm={this.confirm} />;
+      weapon2 = <WeaponSelector ref='Weapon2' name='Pick the Second Heroes weapon' weapons={this.state.weapons} selectedWeapon={this.state.weapon2Object._id} confirm={this.confirm} />;
     }
     if (this.state.weapon2Object) {
       fightbox1 = <FightBox ref='fighter1' hero={this.state.hero1Object} weapon={this.state.weapon1Object} />;
